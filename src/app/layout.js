@@ -1,17 +1,20 @@
-import Providers from "@/providers";
-import "@/app/globals.css";
+import { Inter } from "next/font/google"
+import { Providers } from "@/providers"
+import "./globals.css"
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "Task Manager",
-  description: "A full-stack task management app",
-};
+  description: "A modern task management application",
+}
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
+    <html lang="en">
+      <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
     </html>
-  );
+  )
 }
