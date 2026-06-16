@@ -1,12 +1,12 @@
 import apis from '@/config/axiosConfig';
 
-export const registerRequest = async ({ username, email, password, role }) => {
+export const registerRequest = async ({ username, email, password }) => {
   try {
+    console.log("API URL =", process.env.NEXT_PUBLIC_API_URL);
     const response = await apis.post('auth/register', {
       username,
       email,
       password,
-      role,
     });
     return response.data;
   } catch (error) {

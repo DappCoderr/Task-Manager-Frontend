@@ -6,8 +6,8 @@ import {
 } from "@/api/auth"
 
 export const authService = {
-  register: async ({ username, email, password, role }) => {
-    const response = await registerRequest({ username, email, password, role })
+  register: async ({ username, email, password }) => {
+    const response = await registerRequest({ username, email, password })
     return response
   },
 

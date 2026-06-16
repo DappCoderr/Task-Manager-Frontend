@@ -22,7 +22,7 @@ export default function RegisterPage() {
       username,
       email,
       password,
-      role: ROLES.USER,
+      // role: ROLES.USER,
     })
   }
 
