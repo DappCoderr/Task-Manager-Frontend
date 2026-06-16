@@ -1,24 +1,34 @@
-"use client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { Toaster } from "sonner";
+"use client"
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false },
-  },
-});
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useState } from "react"
+import { Toaster } from "sonner"
+import { AuthProvider } from "@/contexts/AuthContext"
 
-export default function Providers({ children }) {
+export function Providers({ children }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+            retry: 1,
+          },
+        },
+      })
+  )
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          {children}
-          <Toaster richColors position="top-right" />
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        {children}
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={4000}
+        />
+      </AuthProvider>
     </QueryClientProvider>
-  );
+  )
 }
