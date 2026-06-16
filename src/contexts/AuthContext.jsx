@@ -1,34 +1,64 @@
-"use client";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useProfile, useLogout } from "@/hooks/useAuth";
+"use client"
 
-const AuthContext = createContext();
+import { createContext, useState, useEffect, useCallback } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { usePathname } from "next/navigation"
 
-export const useAuth = () => useContext(AuthContext);
+export const AuthContext = createContext(null)
 
-export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
-  const { data: profile, isLoading, isError } = useProfile();
-  const { mutate: logout } = useLogout();
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const pathname = usePathname()
+
+  const publicRoutes = ["/login", "/register", "/"]
+  const isPublicRoute = publicRoutes.includes(pathname)
+
+  const clearAuth = useCallback(() => {
+    setUser(null)
+    queryClient.clear()
+  }, [queryClient])
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-  }, []);
+    const handleClearCache = () => {
+      queryClient.clear()
+    }
+    window.addEventListener("clear-query-cache", handleClearCache)
+    return () => window.removeEventListener("clear-query-cache", handleClearCache)
+  }, [queryClient])
 
-  const login = (newToken) => {
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
-  };
+  // Try to get user profile on mount to check if authenticated
+  // SKIP on public routes to avoid infinite 401 loops
+  useEffect(() => {
+    if (isPublicRoute) {
+      setIsLoading(false)
+      return
+    }
+
+    const checkAuth = async () => {
+      try {
+        const { getProfileRequest } = await import("@/api/users")
+        const response = await getProfileRequest()
+        if (response.success && response.data) {
+          setUser(response.data)
+        }
+      } catch {
+        setUser(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    checkAuth()
+  }, [pathname, isPublicRoute])
 
   const value = {
-    user: profile?.data || null,
+    user,
+    setUser,
+    clearAuth,
     isLoading,
-    isError,
-    isAuthenticated: !!token && !!profile?.data,
-    login,
-    logout,
-  };
+    isAuthenticated: !!user,
+  }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
