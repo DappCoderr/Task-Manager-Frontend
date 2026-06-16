@@ -1,56 +1,49 @@
-// src/apis/auth.js
-// import apis from "./axios";  // uncomment when ready for real API
+import apis from '@/config/axiosConfig';
 
-export const loginUser = async (credentials) => {
-  return {
-    success: true,
-    message: "User logged in successfully",
-    data: {
-      id: "43ffe08d-465a-4f22-be4b-82d13ec265c5",
-      username: "test",
-      email: "t@t.com",
-      role: "USER",
-      token: "dummy-jwt-token-123",
-    },
-    err: {},
-  };
+export const registerRequest = async ({ username, email, password, role }) => {
+  try {
+    const response = await apis.post('auth/register', {
+      username,
+      email,
+      password,
+      role,
+    });
+    return response.data;
+  } catch (error) {
+    console.log('registerRequest error: ', error);
+    throw error.response?.data || error;
+  }
 };
 
-export const logoutUser = async () => {
-  return {
-    success: true,
-    message: "Logged out successfully",
-    data: {},
-    err: {},
-  };
+export const loginRequest = async ({ email, password }) => {
+  try {
+    const response = await apis.post('auth/login', {
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    console.log('loginRequest error: ', error);
+    throw error.response?.data || error;
+  }
 };
 
-export const registerUser = async (payload) => {
-  return {
-    success: true,
-    message: "User created successfully",
-    data: {
-      id: "43ffe08d-465a-4f22-be4b-82d13ec265c5",
-      username: payload.username || "newuser",
-      email: payload.email,
-      role: "USER",
-    },
-    err: {},
-  };
+export const logoutRequest = async () => {
+  try {
+    const response = await apis.post('auth/logout');
+    return response.data;
+  } catch (error) {
+    console.log('logoutRequest error: ', error);
+    throw error.response?.data || error;
+  }
 };
 
-export const getProfile = async () => {
-  return {
-    success: true,
-    message: "User Profile",
-    data: {
-      id: "43ffe08d-465a-4f22-be4b-82d13ec265c5",
-      username: "test",
-      email: "t@t.com",
-      role: "USER",
-      createdAt: "2026-06-12T13:54:49.596Z",
-      updatedAt: "2026-06-13T10:54:46.529Z",
-    },
-    err: {},
-  };
+export const refreshtokenRequest = async () => {
+  try {
+    const response = await apis.post('auth/refresh');
+    return response.data;
+  } catch (error) {
+    console.log('refresh token request error: ', error);
+    throw error.response?.data || error;
+  }
 };
