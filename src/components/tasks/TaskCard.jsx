@@ -1,53 +1,34 @@
-"use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { formatDate } from "@/utils/formatDate";
-import { STATUS_MAP, STATUS_COLORS } from "@/constants/taskStatuses";
+import { Calendar } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { TaskStatusBadge, TaskPriorityBadge } from "./TaskStatusBadge"
+import { formatDate } from "@/lib/utils"
 
-export default function TaskCard({ task, onDelete, onStatusChange }) {
-  const nextStatus =
-    task.status === "pending"
-      ? "in_progress"
-      : task.status === "in_progress"
-      ? "completed"
-      : null;
-
+export function TaskCard({ task }) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
-        <div>
-          <CardTitle className="text-lg">{task.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">{task.description}</p>
+    <Card className="transition-shadow hover:shadow-md">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-gray-900 truncate">
+              {task.title}
+            </h3>
+            {task.description && (
+              <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                {task.description}
+              </p>
+            )}
+          </div>
+          <TaskStatusBadge status={task.status} />
         </div>
-        <Badge className={STATUS_COLORS[task.status]}>
-          {STATUS_MAP[task.status]}
-        </Badge>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-between text-sm mb-3">
-          <span>Due: {formatDate(task.dueDate)}</span>
-          <span className="capitalize">Priority: {task.priority}</span>
-        </div>
-        <div className="flex gap-2">
-          {nextStatus && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onStatusChange(task.id, nextStatus)}
-            >
-              Move to {STATUS_MAP[nextStatus]}
-            </Button>
-          )}
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => onDelete(task.id)}
-          >
-            Delete
-          </Button>
+
+        <div className="mt-4 flex items-center gap-3">
+          <TaskPriorityBadge priority={task.priority} />
+          <div className="flex items-center gap-1 text-xs text-gray-400">
+            <Calendar className="h-3.5 w-3.5" />
+            <span>{formatDate(task.dueDate)}</span>
+          </div>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
